@@ -3,7 +3,7 @@ import { createWriteStream } from 'node:fs'
 import { mkdir, unlink } from 'node:fs/promises'
 import path from 'node:path'
 import crypto from 'node:crypto'
-import { config } from '#/config/env.js'
+import { config } from '#config/env.js'
 
 const EXTENSION_BY_MIME = {
   'image/jpeg': '.jpg',
