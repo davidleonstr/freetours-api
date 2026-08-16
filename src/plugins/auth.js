@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin'
-import { config } from '#/config/env.js'
+import { config } from '#config/env.js'
 
 /**
  * Two layers of protection:

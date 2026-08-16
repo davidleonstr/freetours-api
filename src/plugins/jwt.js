@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 import fastifyJwt from '@fastify/jwt'
-import { config } from '#/config/env.js'
+import { config } from '#config/env.js'
 
 /**
  * Registers @fastify/jwt (adds `fastify.jwt`, `reply.jwtSign`, and

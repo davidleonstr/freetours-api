@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import nodemailer from 'nodemailer'
 import QRCode from 'qrcode'
 import StaticMaps from 'staticmaps'
-import { config } from '#/config/env.js'
+import { config } from '#config/env.js'
 import { escape } from 'html-escaper'
 
 // Brand logo (the "M" horse-head mark), sent as a cid attachment — same

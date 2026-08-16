@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 import pg from 'pg'
-import { config } from '#/config/env.js'
+import { config } from '#config/env.js'
 
 const { Pool } = pg
 
