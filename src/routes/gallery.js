@@ -17,6 +17,33 @@ export default async function galleryRoutes(fastify) {
     return rows
   })
 
+  // Reorders an image within this tour's gallery without detaching and
+  // reattaching it (which would also mean re-uploading nothing but losing
+  // the gallery_id / creating a new row unnecessarily).
+  fastify.patch('/:tourId/gallery/:galleryId', {
+    preHandler: fastify.requirePublishKey,
+    schema: {
+      body: {
+        type: 'object',
+        required: ['position'],
+        properties: {
+          position: { type: 'integer', minimum: 0 }
+        },
+        additionalProperties: false
+      }
+    }
+  }, async (request, reply) => {
+    const { tourId, galleryId } = request.params
+    const { rows } = await pg.query(
+      'UPDATE gallery SET position = $1 WHERE id = $2 AND tour_id = $3 RETURNING *',
+      [request.body.position, galleryId, tourId]
+    )
+    if (!rows.length) {
+      return reply.code(404).send({ error: 'Not Found', message: 'Gallery entry not found.' })
+    }
+    return rows[0]
+  })
+
   // Attaches an already-uploaded image (see POST /images) to a tour's
   // gallery. Upload the image first, then pass its id here — this route
   // no longer accepts a raw external url.

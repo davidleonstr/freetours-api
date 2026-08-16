@@ -22,6 +22,46 @@ export default async function imageRoutes(fastify) {
   // Ensure the upload directory exists before the first request lands.
   await mkdir(config.uploadDir, { recursive: true })
 
+
+  // Updates an image's description ("alt") and/or its own standalone
+  // position field. Distinct from gallery position (see routes/gallery.js),
+  // which controls ordering within one specific tour's gallery.
+  fastify.patch('/:id', {
+    preHandler: fastify.requirePublishKey,
+    schema: {
+      body: {
+        type: 'object',
+        minProperties: 1,
+        properties: {
+          alt: { type: 'string', maxLength: 1000 },
+          position: { type: 'integer', minimum: 0 }
+        },
+        additionalProperties: false
+      }
+    }
+  }, async (request, reply) => {
+    const sets = []
+    const values = []
+    if (request.body.alt !== undefined) {
+      values.push(request.body.alt)
+      sets.push(`alt = $${values.length}`)
+    }
+    if (request.body.position !== undefined) {
+      values.push(request.body.position)
+      sets.push(`position = $${values.length}`)
+    }
+    values.push(request.params.id)
+
+    const { rows } = await pg.query(
+      `UPDATE images SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`,
+      values
+    )
+    if (!rows.length) {
+      return reply.code(404).send({ error: 'Not Found', message: 'Image not found.' })
+    }
+    return rows[0]
+  })
+
   fastify.get('/:id', async (request, reply) => {
     const { rows } = await pg.query('SELECT * FROM images WHERE id = $1', [request.params.id])
     if (!rows.length) {

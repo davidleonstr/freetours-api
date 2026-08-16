@@ -81,14 +81,14 @@ export default async function tourRoutes(fastify) {
     const { id } = request.params
     const { rows } = await pg.query(
       `SELECT t.*,
-              COALESCE(json_agg(DISTINCT jsonb_build_object(
+              COALESCE(json_agg(jsonb_build_object(
                 'id', i.id, 'url', i.url, 'alt', i.alt, 'position', g.position
-              )) FILTER (WHERE i.id IS NOT NULL), '[]') AS gallery
-       FROM tours t
-       LEFT JOIN gallery g ON g.tour_id = t.id
-       LEFT JOIN images i ON i.id = g.image_id
-       WHERE t.id = $1
-       GROUP BY t.id`,
+              ) ORDER BY g.position ASC) FILTER (WHERE i.id IS NOT NULL), '[]') AS gallery
+      FROM tours t
+      LEFT JOIN gallery g ON g.tour_id = t.id
+      LEFT JOIN images i ON i.id = g.image_id
+      WHERE t.id = $1
+      GROUP BY t.id`,
       [id]
     )
     if (!rows.length) {
